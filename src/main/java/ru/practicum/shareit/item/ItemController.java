@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.NewItemMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -31,8 +31,8 @@ public class ItemController {
     public ItemDto addItem(@RequestBody ItemDto itemDto, @RequestHeader HttpHeaders header) {
         String userId = header.getFirst("X-Sharer-User-Id");
         log.info("Получаем POST запрос к эндпойнту /items");
-        Item item = NewItemMapper.toItem(itemDto);
-        return NewItemMapper.toItemDto(itemService.addItem(item, userId));
+        Item item = ItemMapper.toItem(itemDto);
+        return ItemMapper.toItemDto(itemService.addItem(item, userId));
     }
 
     //Редактирование вещи. Эндпойнт PATCH /items/{itemId}. Изменить можно название, описание и статус доступа к аренде.
@@ -44,8 +44,8 @@ public class ItemController {
             @RequestHeader HttpHeaders header) {
         String userId = header.getFirst("X-Sharer-User-Id");
         log.info("Получаем PATCH запрос к эндпойнту /items");
-        Item updateItem = NewItemMapper.toItem(updateItemDto);
-        return NewItemMapper.toItemDto(itemService.updateItem(itemId, updateItem, userId));
+        Item updateItem = ItemMapper.toItem(updateItemDto);
+        return ItemMapper.toItemDto(itemService.updateItem(itemId, updateItem, userId));
     }
 
     //Просмотр информации о конкретной вещи по её идентификатору. Эндпойнт GET /items/{itemId}.
@@ -53,14 +53,15 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ItemDto getItemById(@PathVariable long itemId) {
         log.info("Получаем GET запрос к эндпойнту /items/{}", itemId);
-        return NewItemMapper.toItemDto(itemService.findItemById(itemId));
+        return ItemMapper.toItemDto(itemService.findItemById(itemId));
     }
 
     @GetMapping
     public List<ItemDto> getAllItemByUserId(@RequestHeader HttpHeaders header) {
         String userId = header.getFirst("X-Sharer-User-Id");
         log.info("Получаем GET запрос к эндпойнту /items");
-        return NewItemMapper.toItemsListDto(itemService.findAllItemByUserId(Long.parseLong(userId)));
+        assert userId != null;
+        return ItemMapper.toItemsListDto(itemService.findAllItemByUserId(Long.parseLong(userId)));
     }
 
     //Поиск вещи потенциальным арендатором. Пользователь передаёт в строке запроса текст, и система ищет вещи,
@@ -69,6 +70,6 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> getItemsBySearch(@RequestParam String text) {
         log.info("Получаем GET запрос к эндпойнту /items/search?text={}", text);
-        return NewItemMapper.toItemsListDto(itemService.getItemsBySearch(text));
+        return ItemMapper.toItemsListDto(itemService.getItemsBySearch(text));
     }
 }
