@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.mapper.UsersListMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,34 +16,35 @@ import java.util.List;
 @RequestMapping(path = "/users")
 public class UserController {
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @GetMapping
     public Collection<UserDto> getAllUsersList() {
         log.info("Получаем GET запрос к эндпойнту /users");
         List<User> usersList = userService.getAllUsersList();
-        return UsersListMapper.INSTANCE.toDTOList(usersList);
+        return UserMapper.toUsersListDto(usersList);
     }
 
     @GetMapping("/{userId}")
     public UserDto getUserById(@PathVariable long userId) {
         log.info("Получаем GET запрос к эндпойнту /users/{}", userId);
         User user = userService.findUserById(userId);
-        return UserMapper.INSTANCE.toDTO(user);
+        return UserMapper.toUserDto(user);
     }
 
     @PostMapping
-    public UserDto createUser(@RequestBody User user) {
+    public UserDto createUser(@RequestBody UserDto userDto) {
         log.info("Получаем POST запрос к эндпойнту /users");
-        User userToDto = userService.addUser(user);
-        return UserMapper.INSTANCE.toDTO(userToDto);
+        User user = userService.addUser(UserMapper.toUser(userDto));
+        return UserMapper.toUserDto(user);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable long userId, @RequestBody User updateUser) {
+    public UserDto updateUser(@PathVariable long userId, @RequestBody UserDto updateUserDto) {
         log.info("Получаем PATCH запрос к эндпойнту /users/{}", userId);
-        updateUser.setId(userId);
-        return UserMapper.INSTANCE.toDTO(userService.updateUser(updateUser));
+        updateUserDto.setId(userId);
+        User user = userService.updateUser(UserMapper.toUser(updateUserDto));
+        return UserMapper.toUserDto(user);
     }
 
     @DeleteMapping("/{userId}")

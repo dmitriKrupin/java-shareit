@@ -1,12 +1,10 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dao;
 
-import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-@Service
-public interface UserService {
+public interface UserDao {
     User addUser(User user);
 
     User updateUser(User user);
