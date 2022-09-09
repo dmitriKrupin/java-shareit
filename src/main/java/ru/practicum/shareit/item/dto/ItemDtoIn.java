@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 public class ItemDtoIn {
@@ -22,12 +21,10 @@ public class ItemDtoIn {
     @NotNull(groups = {Create.class})
     private Boolean available;
 
-    public ItemDtoIn(Long id, String name, String description, Boolean available, Long longOwner, Long longRequest) {
+    public ItemDtoIn(Long id, String name, String description, Boolean available) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.available = available;
-        longOwner = null;
-        longRequest = null;
     }
 }
