@@ -33,4 +33,10 @@ public class ExceptionController {
         );
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public UnsupportedException unsupportedException(final UnsupportedException e) {
+        return new UnsupportedException(e.getError());
+    }
+
 }

@@ -7,6 +7,8 @@ import ru.practicum.shareit.exception.ExceptionController;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -130,12 +132,17 @@ public class InMemoryItemDaoImpl implements ItemDao {
             isVlidateSharerUser = false;
             throw exceptionController.badRequestException(new BadRequestException("Пустое поле X-Sharer-User-Id."));
         } else {
-            User user = userService.findUserById(Long.parseLong(userId));
+            UserDto userDto = userService.findUserById(Long.parseLong(userId));
+            User user = UserMapper.toUser(userDto);
+
+            List<UserDto> usersDtoList = userService.getAllUsersDtoList();
+            List<User> userList = UserMapper.toUsersList(usersDtoList);
+
             List<Item> itemList = findAllItemByUserId(Long.parseLong(userId));
             if (isUpdate) {
                 if (itemsMap.containsValue(itemList) &&
                         itemsMap.containsKey(Long.parseLong(userId)) &&
-                        userService.getAllUsersList().contains(user)) {
+                        userList.contains(user)) {
                     isVlidateSharerUser = true;
                     return isVlidateSharerUser;
                 } else {
@@ -144,7 +151,7 @@ public class InMemoryItemDaoImpl implements ItemDao {
                     throw exceptionController.notFoundException(new NotFoundException("Такого пользователя не существует."));
                 }
             } else {
-                if (userService.getAllUsersList().contains(user)) {
+                if (userList.contains(user)) {
                     isVlidateSharerUser = true;
                     return isVlidateSharerUser;
                 } else {

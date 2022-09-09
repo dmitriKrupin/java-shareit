@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Component
+@Component ("InMemoryUserDaoImpl")
 @Slf4j
 public class InMemoryUserDaoImpl implements UserDao {
     private final List<User> usersList = new ArrayList<>();
