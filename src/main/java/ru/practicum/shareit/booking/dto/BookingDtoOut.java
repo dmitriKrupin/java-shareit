@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 
 @Data
 public class BookingDtoOut {
-    Long id;
-    LocalDateTime start;
-    LocalDateTime end;
-    Long bookerId;
-    Status status;
-    UserDto booker;
-    ItemDto item;
+    private Long id;
+    private LocalDateTime start;
+    private LocalDateTime end;
+    private Long bookerId;
+    private Status status;
+    private UserDto booker;
+    private ItemDto item;
 
     public BookingDtoOut(Long id, LocalDateTime start, LocalDateTime end, Status status, UserDto booker, ItemDto item) {
         this.id = id;
