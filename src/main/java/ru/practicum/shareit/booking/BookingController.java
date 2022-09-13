@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.dto.ItemDtoOutPatch;
-import ru.practicum.shareit.item.dto.ItemDtoOutPost;
 
 import java.util.List;
 
@@ -20,7 +18,7 @@ public class BookingController {
     private BookingService bookingService;
 
     @PostMapping
-    public ItemDtoOutPost.BookingDto addBooking(
+    public BookingDtoOut addBooking(
             @RequestBody BookingDtoIn bookingDtoIn,
             @RequestHeader HttpHeaders header) {
         String userId = header.getFirst("X-Sharer-User-Id");
@@ -29,7 +27,7 @@ public class BookingController {
     }
 
     @PatchMapping(value = "/{bookingId}")
-    public ItemDtoOutPatch.BookingDto approvedBooking(
+    public BookingDtoOut approvedBooking(
             @PathVariable long bookingId,
             @RequestParam boolean approved,
             @RequestHeader HttpHeaders header) {

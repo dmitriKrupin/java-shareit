@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -10,8 +10,6 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnsupportedException;
-import ru.practicum.shareit.item.dto.ItemDtoOutPatch;
-import ru.practicum.shareit.item.dto.ItemDtoOutPost;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -20,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -34,7 +32,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public ItemDtoOutPost.BookingDto addBooking(BookingDtoIn bookingDtoIn, String userId) {
+    public BookingDtoOut addBooking(BookingDtoIn bookingDtoIn, String userId) {
         Booking booking = BookingMapper.toBooking(bookingDtoIn);
         booking.setBooker(userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new NotFoundException("Нет такого пользователя с id " + userId)));
@@ -58,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public ItemDtoOutPatch.BookingDto approvedBooking(String userId, Long bookingId, Boolean approved) {
+    public BookingDtoOut approvedBooking(String userId, Long bookingId, Boolean approved) {
         List<Item> itemsList = itemRepository.findAllByOwner_IdOrderById(Long.parseLong(userId));
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Нет такого бронирования с id " + bookingId));

@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.dto.BookingDtoOut;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -17,17 +17,7 @@ public class ItemDtoOutPost {
     private String name;
     private String description;
     private Boolean available;
-    private BookingDto lastBooking;
-    private BookingDto nextBooking;
+    private BookingDtoOut lastBooking;
+    private BookingDtoOut nextBooking;
     private List<CommentDtoOut> comments;
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BookingDto {
-        Long id;
-        LocalDateTime start;
-        LocalDateTime end;
-        Long bookerId;
-    }
 }

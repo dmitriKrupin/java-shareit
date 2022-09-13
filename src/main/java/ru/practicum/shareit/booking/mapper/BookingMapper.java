@@ -3,8 +3,6 @@ package ru.practicum.shareit.booking.mapper;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.dto.ItemDtoOutPatch;
-import ru.practicum.shareit.item.dto.ItemDtoOutPost;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,24 +26,24 @@ public class BookingMapper {
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getStatus(),
-                new ItemDtoOutPatch.BookingDto.UserDto(booking.getBooker().getId()),
-                new ItemDtoOutPatch.BookingDto.ItemDto(booking.getItem().getId(), booking.getItem().getName()));
+                new BookingDtoOut.UserDto(booking.getBooker().getId()),
+                new BookingDtoOut.ItemDto(booking.getItem().getId(), booking.getItem().getName()));
     }
 
-    public static ItemDtoOutPost.BookingDto toBookingDtoForPostOutput(Booking booking) {
-        return new ItemDtoOutPost.BookingDto(
+    public static BookingDtoOut toBookingDtoForPostOutput(Booking booking) {
+        return new BookingDtoOut(
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getBooker().getId());
     }
 
-    public static ItemDtoOutPatch.BookingDto toBookingDtoForPatchOutput(Booking booking) {
-        return new ItemDtoOutPatch.BookingDto(
+    public static BookingDtoOut toBookingDtoForPatchOutput(Booking booking) {
+        return new BookingDtoOut(
                 booking.getId(),
                 booking.getStatus(),
-                new ItemDtoOutPatch.BookingDto.UserDto(booking.getBooker().getId()),
-                new ItemDtoOutPatch.BookingDto.ItemDto(
+                new BookingDtoOut.UserDto(booking.getBooker().getId()),
+                new BookingDtoOut.ItemDto(
                         booking.getItem().getId(),
                         booking.getItem().getName())
         );

@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.mapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.CommentDtoOut;
 import ru.practicum.shareit.item.dto.ItemDtoIn;
@@ -36,12 +37,12 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                new ItemDtoOutPost.BookingDto(
+                new BookingDtoOut(
                         lastBooking.getId(),
                         lastBooking.getStart(),
                         lastBooking.getEnd(),
                         lastBooking.getBooker().getId()),
-                new ItemDtoOutPost.BookingDto(
+                new BookingDtoOut(
                         nextBooking.getId(),
                         nextBooking.getStart(),
                         nextBooking.getEnd(),
@@ -59,7 +60,7 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                new ItemDtoOutPost.BookingDto(
+                new BookingDtoOut(
                         lastBooking.getId(),
                         lastBooking.getStart(),
                         lastBooking.getEnd(),
