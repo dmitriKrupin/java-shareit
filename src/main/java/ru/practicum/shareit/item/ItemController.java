@@ -3,73 +3,75 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.CommentDtoIn;
+import ru.practicum.shareit.item.dto.CommentDtoOut;
+import ru.practicum.shareit.item.dto.ItemDtoIn;
+import ru.practicum.shareit.item.dto.ItemDtoOutPost;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.validate.Create;
+import ru.practicum.shareit.validate.Update;
 
 import java.util.List;
 
-/**
- * Для каждого из данных сценариев создайте соответственный метод в контроллере. Также создайте интерфейс ItemService и
- * реализующий его класс ItemServiceImpl, к которому будет обращаться ваш контроллер. В качестве DAO создайте реализации,
- * которые будут хранить данные в памяти приложения. Работу с базой данных вы реализуете в следующем спринте.
- */
 @RestController
 @Slf4j
-@RequestMapping("/items")
+@RequestMapping(path = "/items")
 public class ItemController {
     @Autowired
     private ItemService itemService;
 
-    //Добавление новой вещи. Будет происходить по эндпойнту POST /items. На вход поступает объект ItemDto.
-    // userId в заголовке X-Sharer-User-Id — это идентификатор пользователя, который добавляет вещь.
-    // Именно этот пользователь — владелец вещи. Идентификатор владельца будет поступать на вход в каждом из запросов,
-    // рассмотренных далее.
     @PostMapping
-    public ItemDto addItem(@RequestBody ItemDto itemDto, @RequestHeader HttpHeaders header) {
+    public ItemDtoIn addItem(
+            @Validated({Create.class})
+            @RequestBody ItemDtoIn itemDtoIn,
+            @RequestHeader HttpHeaders header) {
         String userId = header.getFirst("X-Sharer-User-Id");
         log.info("Получаем POST запрос к эндпойнту /items");
-        Item item = ItemMapper.toItem(itemDto);
-        return ItemMapper.toItemDto(itemService.addItem(item, userId));
+        return itemService.addItem(itemDtoIn, userId);
     }
 
-    //Редактирование вещи. Эндпойнт PATCH /items/{itemId}. Изменить можно название, описание и статус доступа к аренде.
-    // Редактировать вещь может только её владелец.
-    @PatchMapping("/{itemId}")
-    public ItemDto updateItem(
+    @PostMapping("/{itemId}/comment")
+    public CommentDtoOut addComment(
             @PathVariable long itemId,
-            @RequestBody ItemDto updateItemDto,
+            @Validated @RequestBody CommentDtoIn commentDtoIn,
+            @RequestHeader HttpHeaders header) {
+        String userId = header.getFirst("X-Sharer-User-Id");
+        log.info("Получаем GET запрос к эндпойнту /{}/comment", itemId);
+        return itemService.addComment(commentDtoIn, itemId, userId);
+    }
+
+    @PatchMapping("/{itemId}")
+    public ItemDtoIn updateItem(
+            @Validated({Update.class})
+            @PathVariable long itemId,
+            @RequestBody ItemDtoIn updateItemDtoIn,
             @RequestHeader HttpHeaders header) {
         String userId = header.getFirst("X-Sharer-User-Id");
         log.info("Получаем PATCH запрос к эндпойнту /items");
-        Item updateItem = ItemMapper.toItem(updateItemDto);
-        return ItemMapper.toItemDto(itemService.updateItem(itemId, updateItem, userId));
+        return itemService.updateItem(itemId, updateItemDtoIn, userId);
     }
 
-    //Просмотр информации о конкретной вещи по её идентификатору. Эндпойнт GET /items/{itemId}.
-    // Информацию о вещи может просмотреть любой пользователь.
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId) {
+    public ItemDtoOutPost getItemById(@PathVariable long itemId,
+                                      @RequestHeader HttpHeaders header) {
+        String userId = header.getFirst("X-Sharer-User-Id");
         log.info("Получаем GET запрос к эндпойнту /items/{}", itemId);
-        return ItemMapper.toItemDto(itemService.findItemById(itemId));
+        return itemService.findItemById(itemId, userId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemByUserId(@RequestHeader HttpHeaders header) {
+    public List<ItemDtoOutPost> getAllItemByUserId(@RequestHeader HttpHeaders header) {
         String userId = header.getFirst("X-Sharer-User-Id");
         log.info("Получаем GET запрос к эндпойнту /items");
         assert userId != null;
-        return ItemMapper.toItemsListDto(itemService.findAllItemByUserId(Long.parseLong(userId)));
+        return itemService.findAllItemDtoByUserId(Long.parseLong(userId));
     }
 
-    //Поиск вещи потенциальным арендатором. Пользователь передаёт в строке запроса текст, и система ищет вещи,
-    // содержащие этот текст в названии или описании. Происходит по эндпойнту /items/search?text={text},
-    // в text передаётся текст для поиска. Проверьте, что поиск возвращает только доступные для аренды вещи.
     @GetMapping("/search")
-    public List<ItemDto> getItemsBySearch(@RequestParam String text) {
+    public List<ItemDtoIn> getItemsBySearch(@RequestParam String text) {
         log.info("Получаем GET запрос к эндпойнту /items/search?text={}", text);
-        return ItemMapper.toItemsListDto(itemService.getItemsBySearch(text));
+        return itemService.getItemsDtoBySearch(text);
     }
 }
