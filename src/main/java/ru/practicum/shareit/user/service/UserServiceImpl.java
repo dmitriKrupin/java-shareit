@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -10,7 +10,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 
-@Component
+@Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 

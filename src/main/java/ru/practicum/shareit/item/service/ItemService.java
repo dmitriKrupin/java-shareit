@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.service;
 
-import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.CommentDtoIn;
 import ru.practicum.shareit.item.dto.CommentDtoOut;
 import ru.practicum.shareit.item.dto.ItemDtoIn;
@@ -9,7 +8,6 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
-@Service
 public interface ItemService {
     ItemDtoIn addItem(ItemDtoIn itemDtoIn, String userId);
 

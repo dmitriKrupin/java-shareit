@@ -20,7 +20,6 @@ import java.util.List;
 
 @Service
 public class BookingServiceImpl implements BookingService {
-
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
