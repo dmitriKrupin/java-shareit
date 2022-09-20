@@ -7,21 +7,17 @@ import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.CommentDtoIn;
-import ru.practicum.shareit.item.dto.CommentDtoOut;
-import ru.practicum.shareit.item.dto.ItemDtoIn;
-import ru.practicum.shareit.item.dto.ItemDtoOutPost;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.request.repository.RequestRepository;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,38 +27,37 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final RequestRepository requestRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository, RequestRepository requestRepository, BookingRepository bookingRepository, CommentRepository commentRepository) {
+    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository, ItemRequestRepository itemRequestRepository, BookingRepository bookingRepository, CommentRepository commentRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
-        this.requestRepository = requestRepository;
+        this.itemRequestRepository = itemRequestRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
     }
 
     @Override
-    public ItemDtoIn addItem(ItemDtoIn itemDtoIn, String userId) {
+    public ItemDtoOut addItem(ItemDtoIn itemDtoIn, String userId) {
         Item item = ItemMapper.toItem(itemDtoIn);
         if (userRepository.existsById(Long.parseLong(userId))) {
-            ItemRequest request = new ItemRequest();
-            request.setDescription(item.getDescription());
-            request.setRequestor(userRepository.getReferenceById(Long.parseLong(userId)));
-            request.setCreated(LocalDate.now());
-            requestRepository.save(request);
             item.setOwner(userRepository.getReferenceById(Long.parseLong(userId)));
-            item.setRequest(request);
+            if (itemDtoIn.getRequestId() != null) {
+                ItemRequest itemRequest = itemRequestRepository.findById(itemDtoIn.getRequestId())
+                        .orElseThrow(() -> new NotFoundException("Нет вещи с таким id " + itemDtoIn.getRequestId()));
+                item.setItemRequest(itemRequest);
+            }
             itemRepository.save(item);
-            return ItemMapper.toItemDto(item);
+            return ItemMapper.toItemDtoOut(item);
         } else {
             throw new NotFoundException("Нет такого пользователя с id " + userId);
         }
     }
 
     @Override
-    public ItemDtoIn updateItem(long itemId, ItemDtoIn updateItemDtoIn, String userId) {
+    public ItemDtoOut updateItem(long itemId, ItemDtoIn updateItemDtoIn, String userId) {
         Item updateItem = ItemMapper.toItem(updateItemDtoIn);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Нет такой вещи с id " + itemId));
@@ -77,7 +72,7 @@ public class ItemServiceImpl implements ItemService {
                 item.setAvailable(updateItem.getAvailable());
             }
             itemRepository.save(item);
-            return ItemMapper.toItemDto(item);
+            return ItemMapper.toItemDtoOut(item);
         } else {
             throw new NotFoundException("Нет такого пользователя с id " + userId);
         }
@@ -146,10 +141,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoIn> getItemsDtoBySearch(String text) {
+    public List<ItemDtoOut> getItemsDtoBySearch(String text) {
         if (!text.isEmpty()) {
             List<Item> itemsList = itemRepository.findItemListBySearch(text);
-            return ItemMapper.toItemsListDto(itemsList);
+            return ItemMapper.toItemsDtoOutList(itemsList);
         } else {
             System.out.println("Запрос пустой, повторите запрос!");
             return new ArrayList<>();

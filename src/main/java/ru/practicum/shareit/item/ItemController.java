@@ -5,13 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.CommentDtoIn;
-import ru.practicum.shareit.item.dto.CommentDtoOut;
-import ru.practicum.shareit.item.dto.ItemDtoIn;
-import ru.practicum.shareit.item.dto.ItemDtoOutPost;
+import ru.practicum.shareit.common.Create;
+import ru.practicum.shareit.common.Update;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.validate.Create;
-import ru.practicum.shareit.validate.Update;
 
 import java.util.List;
 
@@ -23,7 +20,7 @@ public class ItemController {
     private ItemService itemService;
 
     @PostMapping
-    public ItemDtoIn addItem(
+    public ItemDtoOut addItem(
             @Validated({Create.class})
             @RequestBody ItemDtoIn itemDtoIn,
             @RequestHeader HttpHeaders header) {
@@ -43,7 +40,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDtoIn updateItem(
+    public ItemDtoOut updateItem(
             @Validated({Update.class})
             @PathVariable long itemId,
             @RequestBody ItemDtoIn updateItemDtoIn,
@@ -70,7 +67,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDtoIn> getItemsBySearch(@RequestParam String text) {
+    public List<ItemDtoOut> getItemsBySearch(@RequestParam String text) {
         log.info("Получаем GET запрос к эндпойнту /items/search?text={}", text);
         return itemService.getItemsDtoBySearch(text);
     }

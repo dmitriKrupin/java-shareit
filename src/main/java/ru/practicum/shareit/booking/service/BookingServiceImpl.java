@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
@@ -78,16 +79,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoOut> getAllBookingsByBookerId(String bookerId, String state) {
+    public List<BookingDtoOut> getAllBookingsByBookerId(String bookerId, String state, PageRequest pageRequest) {
         long bookerIdFromString = Long.parseLong(bookerId);
         if (userRepository.existsById(bookerIdFromString)) {
             List<Booking> bookingsList;
             if (state == null || state.equals(Status.ALL.toString())) {
                 bookingsList = bookingRepository.findAllByBooker_IdOrderByEndDesc(
-                        bookerIdFromString);
+                        bookerIdFromString, pageRequest);
             } else {
                 bookingsList = bookingRepository.findAllByBooker_IdAndStatusInOrderByEndDesc(
-                        bookerIdFromString, getListOfStatus(state));
+                        bookerIdFromString, getListOfStatus(state), pageRequest);
                 if (state.equals(Status.PAST.toString())) {
                     bookingsList = bookingsList.subList(bookingsList.size() - 1, bookingsList.size());
                 }
@@ -130,7 +131,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoOut> getAllBookingsByOwnerId(String ownerId, String state) {
+    public List<BookingDtoOut> getAllBookingsByOwnerId(String ownerId, String state, PageRequest pageRequest) {
         long ownerIdFromString = Long.parseLong(ownerId);
         if (userRepository.existsById(ownerIdFromString)) {
             List<Booking> bookingsList;
@@ -140,10 +141,10 @@ public class BookingServiceImpl implements BookingService {
                 ownerIdsList.add(entry.getId());
             }
             if (state == null || state.equals(Status.ALL.toString())) {
-                bookingsList = bookingRepository.findAllByItem_IdInOrderByEndDesc(ownerIdsList);
+                bookingsList = bookingRepository.findAllByItem_IdInOrderByEndDesc(ownerIdsList, pageRequest);
             } else {
                 bookingsList = bookingRepository.findAllByItem_IdInAndStatusInOrderByEndDesc(
-                        ownerIdsList, getListOfStatus(state));
+                        ownerIdsList, getListOfStatus(state), pageRequest);
                 if (state.equals(Status.PAST.toString())) {
                     bookingsList = bookingsList.subList(bookingsList.size() - 1, bookingsList.size());
                 }
