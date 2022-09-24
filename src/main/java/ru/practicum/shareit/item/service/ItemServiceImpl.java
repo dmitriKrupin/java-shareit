@@ -21,6 +21,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -40,10 +41,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDtoOut addItem(ItemDtoIn itemDtoIn, String userId) {
+    public ItemDtoOut addItem(ItemDtoIn itemDtoIn, Long userId) {
         Item item = ItemMapper.toItem(itemDtoIn);
-        if (userRepository.existsById(Long.parseLong(userId))) {
-            item.setOwner(userRepository.getReferenceById(Long.parseLong(userId)));
+        if (userRepository.existsById(userId)) {
+            item.setOwner(userRepository.getReferenceById(userId));
             if (itemDtoIn.getRequestId() != null) {
                 ItemRequest itemRequest = itemRequestRepository.findById(itemDtoIn.getRequestId())
                         .orElseThrow(() -> new NotFoundException("Нет вещи с таким id " + itemDtoIn.getRequestId()));
@@ -57,11 +58,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDtoOut updateItem(long itemId, ItemDtoIn updateItemDtoIn, String userId) {
+    public ItemDtoOut updateItem(long itemId, ItemDtoIn updateItemDtoIn, Long userId) {
         Item updateItem = ItemMapper.toItem(updateItemDtoIn);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Нет такой вещи с id " + itemId));
-        if (userRepository.existsById(Long.parseLong(userId)) && item.getOwner().getId() == Long.parseLong(userId)) {
+        if (userRepository.existsById(userId) && Objects.equals(item.getOwner().getId(), userId)) {
             if (updateItem.getName() != null) {
                 item.setName(updateItem.getName());
             }
@@ -84,7 +85,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDtoOutPost findItemById(long itemId, String userId) {
+    public ItemDtoOutPost findItemById(long itemId, long userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Нет такой вещи с id " + itemId));
         List<Long> itemIdsList = new ArrayList<>();
@@ -101,7 +102,7 @@ public class ItemServiceImpl implements ItemService {
         List<Comment> comments = commentRepository.findAllByItem_Id(itemId);
         List<CommentDtoOut> commentsDtoOutList = ItemMapper.toCommentDtoOut(comments);
 
-        if (item.getOwner().getId() == Long.parseLong(userId) && bookingsList.size() >= 2) {
+        if (item.getOwner().getId() == userId && bookingsList.size() >= 2) {
             for (int i = 0; i < bookingsList.size() - 1; i++) {
                 if (bookingsList.get(i).getEnd().isAfter(bookingsList.get(i + 1).getEnd())) {
                     lastBooking = bookingsList.get(i + 1);
@@ -117,7 +118,7 @@ public class ItemServiceImpl implements ItemService {
                     nextBooking,
                     commentsDtoOutList);
         }
-        if (item.getOwner().getId() == Long.parseLong(userId) && bookingsList.size() == 1) {
+        if (item.getOwner().getId() == userId && bookingsList.size() == 1) {
             lastBooking = bookingsList.get(0);
             return ItemMapper.toItemInfoDto(
                     item,
@@ -135,7 +136,7 @@ public class ItemServiceImpl implements ItemService {
         List<Item> allItemsList = itemRepository.findAllByOwner_IdOrderById(userId);
         List<ItemDtoOutPost> allItemsDtoOutPostList = new ArrayList<>();
         for (Item entry : allItemsList) {
-            allItemsDtoOutPostList.add(findItemById(entry.getId(), String.valueOf(userId)));
+            allItemsDtoOutPostList.add(findItemById(entry.getId(), userId));
         }
         return allItemsDtoOutPostList;
     }
@@ -152,18 +153,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentDtoOut addComment(CommentDtoIn commentDtoIn, long itemId, String userId) {
+    public CommentDtoOut addComment(CommentDtoIn commentDtoIn, long itemId, Long userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Нет вещи с таким id " + itemId));
-        User user = userRepository.findById(Long.parseLong(userId))
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Нет пользователя с таким id " + userId));
         ArrayList<Status> statuses = new ArrayList<>();
         statuses.add(Status.APPROVED);
         statuses.add(Status.CANCELED);
         List<Booking> bookingsList = bookingRepository
-                .findAllByBooker_IdAndStatusInOrderByEndDesc(
-                        Long.parseLong(userId), statuses);
-        if (Long.parseLong(userId) != item.getOwner().getId()
+                .findAllByBooker_IdAndStatusInOrderByEndDesc(userId, statuses);
+        if (!userId.equals(item.getOwner().getId())
                 && bookingsList.size() > 1) {
             Comment comment = new Comment();
             comment.setItem(item);

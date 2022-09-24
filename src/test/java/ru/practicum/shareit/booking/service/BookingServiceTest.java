@@ -1,7 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import org.junit.jupiter.api.Test;
-class BookingServiceImplTest {
+
+class BookingServiceTest {
     //todo: Реализовать юнит-тесты для всего кода, содержащего логику.
     // Выберите те классы, которые содержат в себе нетривиальные методы, условия и ветвления.
     // В основном это будут классы сервисов. Напишите юнит-тесты на все такие методы, используя моки при необходимости.

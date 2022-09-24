@@ -2,7 +2,7 @@ package ru.practicum.shareit.request.service;
 
 import org.junit.jupiter.api.Test;
 
-class ItemRequestServiceImplTest {
+class ItemRequestServiceTest {
 
     @Test
     void addRequest() {
