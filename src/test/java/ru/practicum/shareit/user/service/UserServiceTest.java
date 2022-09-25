@@ -17,10 +17,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class UserServiceTest {
-    UserService userService;
-    UserRepository userRepository;
-    User userOne;
-    User userTwo;
+    private UserService userService;
+    private UserRepository userRepository;
+    private User userOne;
+    private User userTwo;
 
     @BeforeEach
     void beforeEach() {

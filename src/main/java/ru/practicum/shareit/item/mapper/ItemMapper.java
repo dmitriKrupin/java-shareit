@@ -93,6 +93,15 @@ public class ItemMapper {
         );
     }
 
+    public static ItemDtoIn toItemDtoIn(Item item) {
+        return new ItemDtoIn(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable()
+        );
+    }
+
     public static List<ItemDtoOut> toItemsDtoOutList(List<Item> itemsList) {
         List<ItemDtoOut> itemsDtoList = new ArrayList<>();
         for (Item entry : itemsList) {

@@ -43,18 +43,16 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDtoOut addItem(ItemDtoIn itemDtoIn, Long userId) {
         Item item = ItemMapper.toItem(itemDtoIn);
-        if (userRepository.existsById(userId)) {
-            item.setOwner(userRepository.getReferenceById(userId));
-            if (itemDtoIn.getRequestId() != null) {
-                ItemRequest itemRequest = itemRequestRepository.findById(itemDtoIn.getRequestId())
-                        .orElseThrow(() -> new NotFoundException("Нет вещи с таким id " + itemDtoIn.getRequestId()));
-                item.setItemRequest(itemRequest);
-            }
-            itemRepository.save(item);
-            return ItemMapper.toItemDtoOut(item);
-        } else {
-            throw new NotFoundException("Нет такого пользователя с id " + userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Нет такого пользователя с id " + userId));
+        item.setOwner(user);
+        if (itemDtoIn.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(itemDtoIn.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Нет вещи с таким id " + itemDtoIn.getRequestId()));
+            item.setItemRequest(itemRequest);
         }
+        itemRepository.save(item);
+        return ItemMapper.toItemDtoOut(item);
     }
 
     @Override
