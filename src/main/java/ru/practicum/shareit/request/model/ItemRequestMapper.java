@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.item.dto.ItemDtoOut;
+import ru.practicum.shareit.request.dto.ItemRequestDtoIn;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
 
 import java.util.ArrayList;
@@ -15,6 +16,13 @@ public class ItemRequestMapper {
             ItemRequest itemRequest) {
         return new ItemRequestDtoOut(
                 itemRequest.getId(),
+                itemRequest.getDescription(),
+                itemRequest.getCreated());
+    }
+
+    public static ItemRequestDtoIn toItemRequestDtoIn(
+            ItemRequest itemRequest) {
+        return new ItemRequestDtoIn(
                 itemRequest.getDescription(),
                 itemRequest.getCreated());
     }

@@ -151,7 +151,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentDtoOut addComment(CommentDtoIn commentDtoIn, long itemId, Long userId) {
+    public CommentDtoOut addComment(CommentDtoIn commentDtoIn, Long itemId, Long userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Нет вещи с таким id " + itemId));
         User user = userRepository.findById(userId)
@@ -162,14 +162,24 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> bookingsList = bookingRepository
                 .findAllByBooker_IdAndStatusInOrderByEndDesc(userId, statuses);
         if (!userId.equals(item.getOwner().getId())
-                && bookingsList.size() > 1) {
-            Comment comment = new Comment();
-            comment.setItem(item);
-            comment.setAuthor(user);
-            comment.setText(commentDtoIn.getText());
-            comment.setCreated(LocalDateTime.now());
-            commentRepository.save(comment);
-            return ItemMapper.toCommentDtoOut(comment);
+                && bookingsList.size() > 0) {
+            int countOfBookingForItem = bookingsList.size();
+            for (Booking entry : bookingsList) {
+                if (entry.getEnd().isAfter(LocalDateTime.now())) {
+                    countOfBookingForItem--;
+                }
+            }
+            if (countOfBookingForItem > 0) {
+                Comment comment = new Comment();
+                comment.setItem(item);
+                comment.setAuthor(user);
+                comment.setText(commentDtoIn.getText());
+                comment.setCreated(LocalDateTime.now());
+                commentRepository.save(comment);
+                return ItemMapper.toCommentDtoOut(comment);
+            } else {
+                throw new BadRequestException("Бронирование еще не завершено. Комментировать до конца бронирования нельзя!");
+            }
         } else {
             throw new BadRequestException("У бронирования неверный пользователь!");
         }

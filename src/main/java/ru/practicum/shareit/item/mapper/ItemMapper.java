@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.dto.CommentDtoOut;
-import ru.practicum.shareit.item.dto.ItemDtoIn;
-import ru.practicum.shareit.item.dto.ItemDtoOut;
-import ru.practicum.shareit.item.dto.ItemDtoOutPost;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
@@ -125,6 +122,13 @@ public class ItemMapper {
                 comment.getText(),
                 comment.getAuthor().getName(),
                 comment.getCreated()
+        );
+    }
+
+    public static CommentDtoIn toCommentDtoIn(Comment comment) {
+        return new CommentDtoIn(
+                comment.getId(),
+                comment.getText()
         );
     }
 

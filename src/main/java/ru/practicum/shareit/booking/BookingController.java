@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
@@ -25,8 +24,7 @@ public class BookingController {
     @PostMapping
     public BookingDtoOut addBooking(
             @RequestBody BookingDtoIn bookingDtoIn,
-            @RequestHeader HttpHeaders header) {
-        String userId = header.getFirst("X-Sharer-User-Id");
+            @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Получаем POST запрос к эндпойнту /items");
         return bookingService.addBooking(bookingDtoIn, userId);
     }
@@ -35,21 +33,19 @@ public class BookingController {
     public BookingDtoOut approvedBooking(
             @PathVariable long bookingId,
             @RequestParam boolean approved,
-            @RequestHeader HttpHeaders header) {
-        String userId = header.getFirst("X-Sharer-User-Id");
+            @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Получаем PATCH запрос к эндпойнту /{}?approved={}", bookingId, approved);
         return bookingService.approvedBooking(userId, bookingId, approved);
     }
 
     @GetMapping
     public List<BookingDtoOut> getAllBookingsByUser(
-            @RequestHeader HttpHeaders header,
+            @RequestHeader("X-Sharer-User-Id") long bookerId,
             @RequestParam(required = false, name = "state") String state,
             @PositiveOrZero
             @RequestParam(required = false, name = "from", defaultValue = "0") Integer from,
             @Positive
             @RequestParam(required = false, name = "size", defaultValue = "10") Integer size) {
-        String bookerId = header.getFirst("X-Sharer-User-Id");
         log.info("Получаем GET запрос к эндпойнту /bookings?state={}", state);
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
@@ -58,13 +54,12 @@ public class BookingController {
 
     @GetMapping(value = "/owner")
     public List<BookingDtoOut> getBookingsForAllItemsByUser(
-            @RequestHeader HttpHeaders header,
+            @RequestHeader("X-Sharer-User-Id") long ownerId,
             @RequestParam(required = false, name = "state") String state,
             @PositiveOrZero
             @RequestParam(required = false, name = "from", defaultValue = "0") Integer from,
             @Positive
             @RequestParam(required = false, name = "size", defaultValue = "10") Integer size) {
-        String ownerId = header.getFirst("X-Sharer-User-Id");
         log.info("Получаем GET запрос к эндпойнту /owner");
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
@@ -74,8 +69,7 @@ public class BookingController {
     @GetMapping(value = "{bookingId}")
     public BookingDtoOut getBookingById(
             @PathVariable long bookingId,
-            @RequestHeader HttpHeaders header) {
-        String userId = header.getFirst("X-Sharer-User-Id");
+            @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Получаем GET запрос к эндпойнту /{}", bookingId);
         return bookingService.getBookingById(bookingId, userId);
     }

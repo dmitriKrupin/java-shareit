@@ -69,21 +69,24 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         User user = userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("Нет такого ползователя с id " + ownerId));
         List<Item> itemsList = itemRepository.findAllByOwner_IdOrderById(user.getId());
-
-        List<ItemRequestDtoOut> allRequestsOtherUsers = new ArrayList<>();
+        List<ItemRequestDtoOut> allRequestsOtherUsers;
         boolean isOwnerOfItem = true;
-        long requestorId = 0;
+        long requestorId = ownerId;
+        List<ItemRequest> itemRequestList = new ArrayList<>();
+        if (itemsList.size() == 0) {
+            itemRequestList = itemRequestRepository.findAllByRequestor_IdNot(requestorId, pageRequest);
+        }
         for (Item entry : itemsList) {
-            if (entry.getItemRequest() != null && !Objects.equals(entry.getItemRequest().getId(), ownerId)) {
+            if (entry.getItemRequest() != null && !Objects.equals(entry.getItemRequest().getRequestor().getId(), ownerId)) {
                 isOwnerOfItem = false;
-                requestorId = entry.getItemRequest().getId();
+                requestorId = entry.getItemRequest().getRequestor().getId();
             }
         }
         if (!isOwnerOfItem) {
-            List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestor_Id(requestorId, pageRequest);
-            List<ItemDtoOut> itemsDtoOutList = getItemsDtoOutList(itemRequestList);
-            allRequestsOtherUsers = ItemRequestMapper.toItemRequestDtoOutListWithListItems(itemRequestList, itemsDtoOutList);
+            itemRequestList = itemRequestRepository.findAllByRequestor_Id(requestorId, pageRequest);
         }
+        List<ItemDtoOut> itemsDtoOutList = getItemsDtoOutList(itemRequestList);
+        allRequestsOtherUsers = ItemRequestMapper.toItemRequestDtoOutListWithListItems(itemRequestList, itemsDtoOutList);
         return allRequestsOtherUsers;
     }
 

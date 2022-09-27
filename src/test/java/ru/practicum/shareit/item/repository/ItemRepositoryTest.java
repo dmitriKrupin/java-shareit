@@ -17,13 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @DataJpaTest
 class ItemRepositoryTest {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    ItemRepository itemRepository;
-    User user1;
-    User user2;
-    Item item1;
-    Item item2;
+    private ItemRepository itemRepository;
+    private User user1;
+    private User user2;
+    private Item item1;
+    private Item item2;
 
     @BeforeEach
     void beforeEach() {

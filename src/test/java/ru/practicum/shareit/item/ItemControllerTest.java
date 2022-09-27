@@ -28,17 +28,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = ItemController.class)
 @AutoConfigureMockMvc
 class ItemControllerTest {
-    //todo: Реализовать тесты для REST-эндпоинтов вашего приложения с использованием MockMVC.
-    // Вам нужно покрыть тестами все существующие эндпоинты. При этом для слоя сервисов используйте моки.
     @MockBean
-    ItemService itemService;
+    private ItemService itemService;
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
-
-    ItemDtoOut itemDtoOut;
-    ItemDtoIn itemDtoIn;
+    private ItemDtoOut itemDtoOut;
+    private ItemDtoIn itemDtoIn;
 
     @BeforeEach
     void beforeEach() {

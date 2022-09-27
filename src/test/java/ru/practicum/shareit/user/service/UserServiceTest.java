@@ -20,14 +20,12 @@ class UserServiceTest {
     private UserService userService;
     private UserRepository userRepository;
     private User userOne;
-    private User userTwo;
 
     @BeforeEach
     void beforeEach() {
         userRepository = mock(UserRepository.class);
         userService = new UserServiceImpl(userRepository);
         userOne = new User(1L, "userOne@user.com", "userOne");
-        userTwo = new User(2L, "userTwo@user.com", "userTwo");
     }
 
     @Test
