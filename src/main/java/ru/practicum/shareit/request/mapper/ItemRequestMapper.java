@@ -1,10 +1,11 @@
-package ru.practicum.shareit.request.model;
+package ru.practicum.shareit.request.mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.request.dto.ItemRequestDtoIn;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.ArrayList;
 import java.util.List;

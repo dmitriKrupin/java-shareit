@@ -18,6 +18,14 @@ public class ExceptionController {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ConflictException conflictException(final ConflictException e) {
+        return new ConflictException(
+                String.format("Ошибка с полем \"%s\".", e.getParameter())
+        );
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public NotFoundException notFoundException(final NotFoundException e) {
         return new NotFoundException(

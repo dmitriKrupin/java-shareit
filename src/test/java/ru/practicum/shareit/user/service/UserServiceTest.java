@@ -2,6 +2,8 @@ package ru.practicum.shareit.user.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -11,8 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +55,16 @@ class UserServiceTest {
         final UserDto userDto = userService.addUser(UserMapper.toUserDto(userOne));
         assertNotNull(userDto);
         assertEquals(userOne, UserMapper.toUser(userDto));
+
+        User userTwo = new User(2L, "userOne@user.com", "wrongUser");
+        when(userRepository.save(userTwo))
+                .thenThrow(new ConflictException("Такой адрес уже есть в базе!"));
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            userService.addUser(UserMapper.toUserDto(userTwo));
+        });
+        String expectedMessage = "ConflictException";
+        Class<? extends Exception> actualClass = exception.getClass();
+        assertTrue(actualClass.getName().contains(expectedMessage));
     }
 
     @Test
@@ -69,4 +80,12 @@ class UserServiceTest {
         assertEquals(userOne, UserMapper.toUser(userDto));
     }
 
+    @Test
+    void deleteUserDto() {
+        when(userRepository.findById(1L))
+                .thenReturn(Optional.of(userOne));
+        userService.deleteUserDto(1L);
+        Mockito.verify(userRepository, Mockito.times(1))
+                .delete(userOne);
+    }
 }

@@ -116,10 +116,12 @@ class BookingServiceTest {
     @Test
     void getAllBookingsByOwnerId() {
         long ownerIdFromString = 1L;
-        String state = "FUTURE";
+        String state = "PAST";
         ArrayList<Status> statusArrayList = new ArrayList<>();
-        statusArrayList.add(Status.WAITING);
+        statusArrayList.add(Status.CANCELED);
         statusArrayList.add(Status.APPROVED);
+        bookingOne.setStatus(Status.CANCELED);
+        bookingTwo.setStatus(Status.CANCELED);
         when(userRepository.existsById(ownerIdFromString))
                 .thenReturn(true);
         when(itemRepository.findAllByOwner_IdOrderById(ownerIdFromString))
@@ -133,7 +135,7 @@ class BookingServiceTest {
         List<BookingDtoOut> bookingDtoOutList = bookingService.getAllBookingsByOwnerId(
                 ownerIdFromString, state, PageRequest.of(0, 10));
         assertNotNull(bookingDtoOutList);
-        assertEquals(Status.APPROVED, bookingDtoOutList.get(0).getStatus());
+        assertEquals(Status.CANCELED, bookingDtoOutList.get(0).getStatus());
         assertEquals(1, bookingDtoOutList.size());
 
         Exception exception = assertThrows(RuntimeException.class, () -> {

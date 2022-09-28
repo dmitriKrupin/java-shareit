@@ -107,11 +107,15 @@ public class ItemMapper {
         return itemsDtoList;
     }
 
-    public static List<ItemDtoOutPost> toItemsListDtoOutPost(List<Item> itemsList) {
+    public static List<ItemDtoOutPost> toItemsListDtoOutPost(
+            List<Item> itemsList,
+            Booking lastBooking,
+            Booking nextBooking,
+            List<CommentDtoOut> comments) {
         List<ItemDtoOutPost> itemsListDtoOutPost = new ArrayList<>();
         for (Item entry : itemsList) {
             itemsListDtoOutPost.add(ItemMapper.toItemInfoDto(
-                    entry, new Booking(), new Booking(), new ArrayList<>()));
+                    entry, lastBooking, nextBooking, comments));
         }
         return itemsListDtoOutPost;
     }

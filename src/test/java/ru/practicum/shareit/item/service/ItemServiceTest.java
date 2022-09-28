@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -98,6 +99,9 @@ class ItemServiceTest {
 
     @Test
     void deleteItemDto() {
+        itemService.deleteItemDto(itemOne);
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .delete(itemOne);
     }
 
     @Test
@@ -157,7 +161,7 @@ class ItemServiceTest {
 
         bookingTwo.setEnd(LocalDateTime.now().plusHours(100));
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            itemService.addComment(commentDtoIn,1L, 2L);
+            itemService.addComment(commentDtoIn, 1L, 2L);
         });
         String expectedMessage = "BadRequestException";
         Class<? extends Exception> actualClass = exception.getClass();

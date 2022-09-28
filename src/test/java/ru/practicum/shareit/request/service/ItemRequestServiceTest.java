@@ -7,8 +7,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDtoIn;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
+import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.request.model.ItemRequestMapper;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -32,6 +32,7 @@ class ItemRequestServiceTest {
     private ItemRequest itemRequestTwo;
     private User userOne;
     private User userTwo;
+    private User userThree;
     private Item itemOne;
     private Item itemTwo;
 
@@ -44,11 +45,17 @@ class ItemRequestServiceTest {
                 userRepository, itemRepository);
         userOne = new User(1L, "userOne@user.com", "userOne");
         userTwo = new User(2L, "userTwo@user.com", "userTwo");
+        userThree = new User(3L, "userThree@user.com", "userThree");
         itemRequestOne = new ItemRequest(1L, "request one from userOne",
                 userOne, LocalDateTime.of(2022, 9, 25, 14,
                 17, 3));
+        itemRequestTwo = new ItemRequest(2L, "request two from userOne",
+                userTwo, LocalDateTime.of(2022, 9, 25, 14,
+                17, 3));;
         itemOne = new Item(1L, "item one", "item one description",
                 true, userOne, itemRequestOne);
+        itemTwo = new Item(2L, "item two", "item two description",
+                true, userTwo, itemRequestTwo);
     }
 
     @Test
@@ -85,8 +92,6 @@ class ItemRequestServiceTest {
 
     @Test
     void getAllRequestsOtherUsers() {
-        when(userRepository.findById(1L))
-                .thenReturn(Optional.of(userOne));
         when(userRepository.findById(2L))
                 .thenReturn(Optional.of(userTwo));
         when(itemRepository.findAllByOwner_IdOrderById(1L))
@@ -94,8 +99,8 @@ class ItemRequestServiceTest {
         when(itemRequestRepository.findAllByRequestor_IdNot(2L,
                 PageRequest.of(0, 10))).thenReturn(List.of(itemRequestOne));
 
-        List<ItemRequestDtoOut> itemRequestDtoOutList = itemRequestService.getAllRequestsOtherUsers(
-                2L, PageRequest.of(0, 10));
+        List<ItemRequestDtoOut> itemRequestDtoOutList = itemRequestService
+                .getAllRequestsOtherUsers(2L, PageRequest.of(0, 10));
 
         assertNotNull(itemRequestDtoOutList);
         assertEquals(1, itemRequestDtoOutList.size());
