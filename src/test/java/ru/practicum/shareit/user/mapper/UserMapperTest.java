@@ -12,10 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class UserMapperTest {
-    User user;
-    UserDto userDto;
-    List<User> usersList = new ArrayList<>();
-    List<UserDto> userDtoList = new ArrayList<>();
+    private User user;
+    private UserDto userDto;
+    private List<User> usersList = new ArrayList<>();
+    private List<UserDto> userDtoList = new ArrayList<>();
 
     @BeforeEach
     void beforeEach() {
