@@ -75,6 +75,7 @@ class ItemServiceTest {
         ItemDtoIn itemDtoIn = ItemMapper.toItemDtoIn(itemOne);
         when(userRepository.findById(userOne.getId()))
                 .thenReturn(Optional.of(userOne));
+        itemDtoIn.setRequestId(1L);
         when(itemRequestRepository.findById(itemDtoIn.getRequestId()))
                 .thenReturn(Optional.of(itemRequestOne));
         when(itemRepository.save(itemOne))
@@ -95,6 +96,15 @@ class ItemServiceTest {
         final ItemDtoOut itemDtoOut = itemService.updateItem(1L, itemDtoInUpdate, 1L);
         assertNotNull(itemDtoOut);
         assertEquals(ItemMapper.toItemDtoOut(itemOne), itemDtoOut);
+
+        when(userRepository.existsById(1L))
+                .thenReturn(false);
+        Exception oneException = assertThrows(RuntimeException.class, () -> {
+            itemService.updateItem(1L, itemDtoInUpdate, 1L);
+        });
+        String oneExpectedMessage = "NotFoundException";
+        Class<? extends Exception> oneActualClass = oneException.getClass();
+        assertTrue(oneActualClass.getName().contains(oneExpectedMessage));
     }
 
     @Test
@@ -166,5 +176,7 @@ class ItemServiceTest {
         String expectedMessage = "BadRequestException";
         Class<? extends Exception> actualClass = exception.getClass();
         assertTrue(actualClass.getName().contains(expectedMessage));
+
+
     }
 }

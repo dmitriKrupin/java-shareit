@@ -73,6 +73,25 @@ class BookingServiceTest {
         assertNotNull(bookingDtoOut);
         assertEquals(BookingMapper.toBookingDtoOut(bookingOne).getStart(),
                 bookingDtoOut.getStart());
+
+        itemTwo.setOwner(userOne);
+        Exception oneException = assertThrows(RuntimeException.class, () -> {
+            bookingService.addBooking(
+                    BookingMapper.toBookingDtoIn(bookingOne), 1L);
+        });
+        String oneExpectedMessage = "NotFoundException";
+        Class<? extends Exception> oneActualClass = oneException.getClass();
+        assertTrue(oneActualClass.getName().contains(oneExpectedMessage));
+
+        itemTwo.setOwner(userTwo);
+        itemTwo.setAvailable(false);
+        Exception secondException = assertThrows(RuntimeException.class, () -> {
+            bookingService.addBooking(
+                    BookingMapper.toBookingDtoIn(bookingOne), 1L);
+        });
+        String secondExpectedMessage = "BadRequestException";
+        Class<? extends Exception> secondActualClass = secondException.getClass();
+        assertTrue(secondActualClass.getName().contains(secondExpectedMessage));
     }
 
     @Test
@@ -88,6 +107,24 @@ class BookingServiceTest {
                 2L, 1L, true);
         assertNotNull(bookingDtoOut);
         assertEquals(Status.APPROVED, bookingDtoOut.getStatus());
+
+        Exception oneException = assertThrows(RuntimeException.class, () -> {
+            bookingService.approvedBooking(
+                    2L, 1L, true);
+        });
+        String oneExpectedMessage = "BadRequestException";
+        Class<? extends Exception> oneActualClass = oneException.getClass();
+        assertTrue(oneActualClass.getName().contains(oneExpectedMessage));
+
+        when(itemRepository.findAllByOwner_IdOrderById(2L))
+                .thenReturn(List.of(itemOne));
+        Exception secondException = assertThrows(RuntimeException.class, () -> {
+            bookingService.approvedBooking(
+                    2L, 1L, true);
+        });
+        String secondExpectedMessage = "NotFoundException";
+        Class<? extends Exception> secondActualClass = secondException.getClass();
+        assertTrue(secondActualClass.getName().contains(secondExpectedMessage));
     }
 
     @Test
@@ -111,6 +148,31 @@ class BookingServiceTest {
         assertNotNull(bookingDtoOutList);
         assertEquals(Status.APPROVED, bookingDtoOutList.get(0).getStatus());
         assertEquals(1, bookingDtoOutList.size());
+
+        List<BookingDtoOut> withNullStateBookingDtoOutList = bookingService
+                .getAllBookingsByBookerId(bookerId, null, PageRequest.of(0, 10));
+        assertNotNull(withNullStateBookingDtoOutList);
+        assertEquals(1, withNullStateBookingDtoOutList.size());
+
+        bookingTwo.setStatus(Status.CANCELED);
+        when(bookingRepository.findAllByBooker_IdAndStatusInOrderByEndDesc(
+                bookerId, List.of(Status.CANCELED, Status.APPROVED),
+                PageRequest.of(0, 10)))
+                .thenReturn(List.of(bookingTwo));
+        List<BookingDtoOut> withPastStateBookingDtoOutList = bookingService
+                .getAllBookingsByBookerId(bookerId, "PAST", PageRequest.of(0, 10));
+        assertNotNull(withPastStateBookingDtoOutList);
+        assertEquals(1, withPastStateBookingDtoOutList.size());
+
+        when(userRepository.existsById(bookerId))
+                .thenReturn(false);
+        Exception oneException = assertThrows(RuntimeException.class, () -> {
+            bookingService.getAllBookingsByBookerId(
+                    bookerId, state, PageRequest.of(0, 10));
+        });
+        String oneExpectedMessage = "NotFoundException";
+        Class<? extends Exception> oneActualClass = oneException.getClass();
+        assertTrue(oneActualClass.getName().contains(oneExpectedMessage));
     }
 
     @Test
@@ -144,6 +206,21 @@ class BookingServiceTest {
         String expectedMessage = "UnsupportedException";
         Class<? extends Exception> actualClass = exception.getClass();
         assertTrue(actualClass.getName().contains(expectedMessage));
+
+        List<BookingDtoOut> withNullBookingDtoOutList = bookingService.getAllBookingsByOwnerId(
+                ownerIdFromString, null, PageRequest.of(0, 10));
+        assertNotNull(withNullBookingDtoOutList);
+        assertEquals(1, withNullBookingDtoOutList.size());
+
+        when(userRepository.existsById(ownerIdFromString))
+                .thenReturn(false);
+        Exception oneException = assertThrows(RuntimeException.class, () -> {
+            bookingService.getAllBookingsByOwnerId(
+                    ownerIdFromString, state, PageRequest.of(0, 10));
+        });
+        String oneExpectedMessage = "NotFoundException";
+        Class<? extends Exception> oneActualClass = oneException.getClass();
+        assertTrue(oneActualClass.getName().contains(oneExpectedMessage));
     }
 
     @Test
@@ -154,5 +231,13 @@ class BookingServiceTest {
         assertNotNull(bookingDtoOut);
         assertEquals(BookingMapper.toBookingDtoOut(bookingOne).getStart(),
                 bookingDtoOut.getStart());
+
+        bookingOne.setBooker(userTwo);
+        Exception oneException = assertThrows(RuntimeException.class, () -> {
+            bookingService.getBookingById(1L, 1L);
+        });
+        String oneExpectedMessage = "NotFoundException";
+        Class<? extends Exception> oneActualClass = oneException.getClass();
+        assertTrue(oneActualClass.getName().contains(oneExpectedMessage));
     }
 }
