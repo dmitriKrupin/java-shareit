@@ -125,6 +125,12 @@ class ItemServiceTest {
         final ItemDtoOutPost itemDtoOutPost = itemService.findItemById(1L, 1L);
         assertNotNull(itemDtoOutPost);
         assertEquals(bookingOne.getEnd(), itemDtoOutPost.getLastBooking().getEnd());
+
+        when(bookingRepository.findAllByItem_IdInAndStatusInOrderByEndDesc(List.of(1L), List.of(Status.APPROVED)))
+                .thenReturn(List.of(bookingOne, bookingTwo));
+        final ItemDtoOutPost sizeOfTwoItemDtoOutPost = itemService.findItemById(1L, 1L);
+        assertNotNull(sizeOfTwoItemDtoOutPost);
+        assertEquals(bookingTwo.getEnd(), sizeOfTwoItemDtoOutPost.getLastBooking().getEnd());
     }
 
     @Test
@@ -150,6 +156,9 @@ class ItemServiceTest {
         List<ItemDtoOut> itemDtoOutList = itemService.getItemsDtoBySearch("item");
         assertNotNull(itemDtoOutList);
         assertEquals(ItemMapper.toItemDtoOut(itemOne), itemDtoOutList.get(0));
+
+        List<ItemDtoOut> emptyItemDtoOutList = itemService.getItemsDtoBySearch("");
+        assertNotNull(emptyItemDtoOutList);
     }
 
     @Test
@@ -170,13 +179,20 @@ class ItemServiceTest {
         assertEquals(commentDtoIn.getText(), commentDtoOut.getText());
 
         bookingTwo.setEnd(LocalDateTime.now().plusHours(100));
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        Exception oneException = assertThrows(RuntimeException.class, () -> {
             itemService.addComment(commentDtoIn, 1L, 2L);
         });
-        String expectedMessage = "BadRequestException";
-        Class<? extends Exception> actualClass = exception.getClass();
-        assertTrue(actualClass.getName().contains(expectedMessage));
+        String oneExpectedMessage = "BadRequestException";
+        Class<? extends Exception> oneActualClass = oneException.getClass();
+        assertTrue(oneActualClass.getName().contains(oneExpectedMessage));
 
-
+        when(userRepository.findById(1L))
+                .thenReturn(Optional.of(userOne));
+        Exception secondException = assertThrows(RuntimeException.class, () -> {
+            itemService.addComment(commentDtoIn, 1L, 1L);
+        });
+        String secondExpectedMessage = "BadRequestException";
+        Class<? extends Exception> secondActualClass = secondException.getClass();
+        assertTrue(secondActualClass.getName().contains(secondExpectedMessage));
     }
 }

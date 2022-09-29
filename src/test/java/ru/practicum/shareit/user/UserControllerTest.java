@@ -48,8 +48,5 @@ class UserControllerTest {
 
     @Test
     void deleteUser() {
-        //userService.deleteUser(5L);
-        //Mockito.verify(userRepository, Mockito.times(1))
-        //        .deleteById(anyLong());
     }
 }

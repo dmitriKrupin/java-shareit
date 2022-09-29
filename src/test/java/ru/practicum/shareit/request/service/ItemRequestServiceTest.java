@@ -51,7 +51,7 @@ class ItemRequestServiceTest {
                 17, 3));
         itemRequestTwo = new ItemRequest(2L, "request two from userOne",
                 userTwo, LocalDateTime.of(2022, 9, 25, 14,
-                17, 3));;
+                17, 3));
         itemOne = new Item(1L, "item one", "item one description",
                 true, userOne, itemRequestOne);
         itemTwo = new Item(2L, "item two", "item two description",
