@@ -106,8 +106,7 @@ class ItemRequestControllerTest {
 
     @Test
     void getRequestById() throws Exception {
-        when(itemRequestService.getRequestById(1L, 1L,
-                PageRequest.of(0, 10)))
+        when(itemRequestService.getRequestById(1L, 1L))
                 .thenReturn(itemRequestDtoOut);
         mockMvc.perform(get("/requests/1")
                         .content(mapper.writeValueAsString(itemRequestDtoIn))
@@ -118,7 +117,6 @@ class ItemRequestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemRequestDtoOut)));
         verify(itemRequestService, Mockito.times(1))
-                .getRequestById(1L, 1L,
-                        PageRequest.of(0, 10));
+                .getRequestById(1L, 1L);
     }
 }

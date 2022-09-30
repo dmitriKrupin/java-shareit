@@ -26,7 +26,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
-    public ItemRequestServiceImpl(ItemRequestRepository itemRequestRepository, UserRepository userRepository, ItemRepository itemRepository) {
+    public ItemRequestServiceImpl(
+            ItemRequestRepository itemRequestRepository, UserRepository userRepository, ItemRepository itemRepository) {
         this.itemRequestRepository = itemRequestRepository;
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
@@ -45,15 +46,17 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDtoOut> getAllRequestsByUserId(long userId, PageRequest pageRequest) {
+    public List<ItemRequestDtoOut> getAllRequestsByUserId(
+            long userId, PageRequest pageRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Нет такого пользователя с id " + userId));
-        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestor_Id(userId, pageRequest);
+        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestor_Id(userId);
         List<ItemDtoOut> itemsDtoOutList = getItemsDtoOutList(itemRequestList);
         return ItemRequestMapper.toItemRequestDtoOutListWithListItems(itemRequestList, itemsDtoOutList);
     }
 
-    private List<ItemDtoOut> getItemsDtoOutList(List<ItemRequest> itemRequestList) {
+    private List<ItemDtoOut> getItemsDtoOutList(
+            List<ItemRequest> itemRequestList) {
         List<Item> itemsList = new ArrayList<>();
         for (ItemRequest entry : itemRequestList) {
             String[] searchText = entry.getDescription().split(" ");
@@ -68,7 +71,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDtoOut> getAllRequestsOtherUsers(Long ownerId, PageRequest pageRequest) {
         User user = userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("Нет такого ползователя с id " + ownerId));
-        List<Item> itemsList = itemRepository.findAllByOwner_IdOrderById(user.getId());
+        List<Item> itemsList = itemRepository.findAllByOwner_IdOrderById(
+                user.getId(), pageRequest);
         List<ItemRequestDtoOut> allRequestsOtherUsers;
         boolean isOwnerOfItem = true;
         long requestorId = ownerId;
@@ -83,20 +87,21 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             }
         }
         if (!isOwnerOfItem) {
-            itemRequestList = itemRequestRepository.findAllByRequestor_Id(requestorId, pageRequest);
+            itemRequestList = itemRequestRepository.findAllByRequestor_Id(requestorId);
         }
-        List<ItemDtoOut> itemsDtoOutList = getItemsDtoOutList(itemRequestList);
+        List<ItemDtoOut> itemsDtoOutList = getItemsDtoOutList(
+                itemRequestList);
         allRequestsOtherUsers = ItemRequestMapper.toItemRequestDtoOutListWithListItems(itemRequestList, itemsDtoOutList);
         return allRequestsOtherUsers;
     }
 
     @Override
-    public ItemRequestDtoOut getRequestById(long userId, long requestId, PageRequest pageRequest) {
+    public ItemRequestDtoOut getRequestById(long userId, long requestId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Нет такого пользователя с id " + userId));
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Нет такого запроса с id " + requestId));
-        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestor_Id(requestId, pageRequest);
+        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestor_Id(requestId);
         List<ItemDtoOut> itemsDtoOutList = getItemsDtoOutList(itemRequestList);
         return ItemRequestMapper.toItemRequestDtoOutWithListItems(itemRequest, itemsDtoOutList);
     }

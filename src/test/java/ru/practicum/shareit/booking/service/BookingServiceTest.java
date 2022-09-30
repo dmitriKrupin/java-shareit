@@ -96,7 +96,7 @@ class BookingServiceTest {
 
     @Test
     void approvedBooking() {
-        when(itemRepository.findAllByOwner_IdOrderById(2L))
+        when(itemRepository.findAllByOwner_IdOrderById(2L, PageRequest.of(0, 10)))
                 .thenReturn(List.of(itemTwo));
         when(bookingRepository.findById(1L))
                 .thenReturn(Optional.of(bookingOne));
@@ -116,7 +116,7 @@ class BookingServiceTest {
         Class<? extends Exception> oneActualClass = oneException.getClass();
         assertTrue(oneActualClass.getName().contains(oneExpectedMessage));
 
-        when(itemRepository.findAllByOwner_IdOrderById(2L))
+        when(itemRepository.findAllByOwner_IdOrderById(2L, PageRequest.of(0, 10)))
                 .thenReturn(List.of(itemOne));
         Exception secondException = assertThrows(RuntimeException.class, () -> {
             bookingService.approvedBooking(
@@ -186,7 +186,8 @@ class BookingServiceTest {
         bookingTwo.setStatus(Status.CANCELED);
         when(userRepository.existsById(ownerIdFromString))
                 .thenReturn(true);
-        when(itemRepository.findAllByOwner_IdOrderById(ownerIdFromString))
+        when(itemRepository.findAllByOwner_IdOrderById(
+                ownerIdFromString, PageRequest.of(0, 10)))
                 .thenReturn(List.of(itemOne));
         when(bookingRepository.findAllByItem_IdInOrderByEndDesc(List.of(ownerIdFromString),
                 PageRequest.of(0, 10))).thenReturn(List.of(bookingOne));

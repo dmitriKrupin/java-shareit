@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -137,12 +138,15 @@ class ItemServiceTest {
     void findAllItemDtoByUserId() {
         when(itemRepository.findById(1L))
                 .thenReturn(Optional.of(itemOne));
-        when(itemRepository.findAllByOwner_IdOrderById(1L))
+        when(itemRepository.findAllByOwner_IdOrderById(1L,
+                PageRequest.of(0, 10)))
                 .thenReturn(List.of(itemOne));
-        List<ItemDtoOutPost> itemDtoOutPostList = itemService.findAllItemDtoByUserId(1L);
+        List<ItemDtoOutPost> itemDtoOutPostList = itemService.findAllItemDtoByUserId(1L,
+                PageRequest.of(0, 10));
         when(itemRepository.findById(4L))
                 .thenThrow(new NotFoundException("Нет такой вещи с id " + 4L));
-        List<ItemDtoOutPost> notItemDtoOutPostList = itemService.findAllItemDtoByUserId(4L);
+        List<ItemDtoOutPost> notItemDtoOutPostList = itemService.findAllItemDtoByUserId(4L,
+                PageRequest.of(0, 10));
 
         assertNotNull(itemDtoOutPostList);
         assertEquals(1, itemDtoOutPostList.size());
@@ -153,11 +157,13 @@ class ItemServiceTest {
     void getItemsDtoBySearch() {
         when(itemRepository.findItemListBySearch("item"))
                 .thenReturn(List.of(itemOne));
-        List<ItemDtoOut> itemDtoOutList = itemService.getItemsDtoBySearch("item");
+        List<ItemDtoOut> itemDtoOutList = itemService.getItemsDtoBySearch("item",
+                PageRequest.of(0, 10));
         assertNotNull(itemDtoOutList);
         assertEquals(ItemMapper.toItemDtoOut(itemOne), itemDtoOutList.get(0));
 
-        List<ItemDtoOut> emptyItemDtoOutList = itemService.getItemsDtoBySearch("");
+        List<ItemDtoOut> emptyItemDtoOutList = itemService.getItemsDtoBySearch("",
+                PageRequest.of(0, 10));
         assertNotNull(emptyItemDtoOutList);
     }
 

@@ -58,7 +58,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDtoOut approvedBooking(Long userId, Long bookingId, Boolean approved) {
-        List<Item> itemsList = itemRepository.findAllByOwner_IdOrderById(userId);
+        List<Item> itemsList = itemRepository.findAllByOwner_IdOrderById(
+                userId, PageRequest.of(0, 10));
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Нет такого бронирования с id " + bookingId));
         if (itemsList.contains(booking.getItem())
@@ -137,7 +138,8 @@ public class BookingServiceImpl implements BookingService {
         if (userRepository.existsById(ownerIdFromString)) {
             List<Booking> bookingsList;
             List<Long> ownerIdsList = new ArrayList<>();
-            List<Item> item = itemRepository.findAllByOwner_IdOrderById(ownerIdFromString);
+            List<Item> item = itemRepository.findAllByOwner_IdOrderById(
+                    ownerIdFromString, PageRequest.of(0, 10));
             for (Item entry : item) {
                 ownerIdsList.add(entry.getId());
             }

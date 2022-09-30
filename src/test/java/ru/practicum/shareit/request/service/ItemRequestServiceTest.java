@@ -79,8 +79,7 @@ class ItemRequestServiceTest {
         itemRequestList.add(itemRequestOne);
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(userOne));
-        when(itemRequestRepository.findAllByRequestor_Id(1L,
-                PageRequest.of(0, 10))).thenReturn(itemRequestList);
+        when(itemRequestRepository.findAllByRequestor_Id(1L)).thenReturn(itemRequestList);
         List<ItemRequestDtoOut> itemRequestDtoOutList = itemRequestService
                 .getAllRequestsByUserId(1L, PageRequest.of(0, 10));
         assertNotNull(itemRequestDtoOutList);
@@ -94,7 +93,8 @@ class ItemRequestServiceTest {
     void getAllRequestsOtherUsers() {
         when(userRepository.findById(2L))
                 .thenReturn(Optional.of(userTwo));
-        when(itemRepository.findAllByOwner_IdOrderById(1L))
+        when(itemRepository.findAllByOwner_IdOrderById(1L,
+                PageRequest.of(0, 10)))
                 .thenReturn(List.of(itemOne));
         when(itemRequestRepository.findAllByRequestor_IdNot(2L,
                 PageRequest.of(0, 10))).thenReturn(List.of(itemRequestOne));
@@ -115,9 +115,9 @@ class ItemRequestServiceTest {
                 .thenReturn(Optional.of(userOne));
         when(itemRequestRepository.findById(1L))
                 .thenReturn(Optional.of(itemRequestOne));
-        when(itemRequestRepository.findAllByRequestor_Id(1L, PageRequest.of(0, 10)))
+        when(itemRequestRepository.findAllByRequestor_Id(1L))
                 .thenReturn(List.of(itemRequestOne));
-        ItemRequestDtoOut itemRequestDtoOut = itemRequestService.getRequestById(1L, 1L, PageRequest.of(0, 10));
+        ItemRequestDtoOut itemRequestDtoOut = itemRequestService.getRequestById(1L, 1L);
         assertNotNull(itemRequestDtoOut);
         itemRequestDtoOut.setItems(null);
         assertEquals(ItemRequestMapper.toItemRequestDtoOut(itemRequestOne),

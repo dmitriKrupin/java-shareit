@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.item.dto.ItemDtoIn;
@@ -45,7 +46,7 @@ class ItemControllerTest {
 
     @Test
     void getAllItemByUserId() throws Exception {
-        when(itemService.findAllItemDtoByUserId(1))
+        when(itemService.findAllItemDtoByUserId(1, PageRequest.of(0, 10)))
                 .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/items")
@@ -54,7 +55,7 @@ class ItemControllerTest {
                 .andExpect(content().json("[]"));
 
         verify(itemService, Mockito.times(1))
-                .findAllItemDtoByUserId(1);
+                .findAllItemDtoByUserId(1, PageRequest.of(0, 10));
     }
 
     @Test

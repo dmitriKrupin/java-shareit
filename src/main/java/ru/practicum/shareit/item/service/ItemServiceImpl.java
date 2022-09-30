@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
@@ -32,7 +33,12 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository, ItemRequestRepository itemRequestRepository, BookingRepository bookingRepository, CommentRepository commentRepository) {
+    public ItemServiceImpl(
+            ItemRepository itemRepository,
+            UserRepository userRepository,
+            ItemRequestRepository itemRequestRepository,
+            BookingRepository bookingRepository,
+            CommentRepository commentRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.itemRequestRepository = itemRequestRepository;
@@ -130,8 +136,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoOutPost> findAllItemDtoByUserId(long userId) {
-        List<Item> allItemsList = itemRepository.findAllByOwner_IdOrderById(userId);
+    public List<ItemDtoOutPost> findAllItemDtoByUserId(long userId, PageRequest pageRequest) {
+        List<Item> allItemsList = itemRepository.findAllByOwner_IdOrderById(
+                userId, pageRequest);
         List<ItemDtoOutPost> allItemsDtoOutPostList = new ArrayList<>();
         for (Item entry : allItemsList) {
             allItemsDtoOutPostList.add(findItemById(entry.getId(), userId));
@@ -140,7 +147,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoOut> getItemsDtoBySearch(String text) {
+    public List<ItemDtoOut> getItemsDtoBySearch(String text, PageRequest pageRequest) {
         if (!text.isEmpty()) {
             List<Item> itemsList = itemRepository.findItemListBySearch(text);
             return ItemMapper.toItemsDtoOutList(itemsList);

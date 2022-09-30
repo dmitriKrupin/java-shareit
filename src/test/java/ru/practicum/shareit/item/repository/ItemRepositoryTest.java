@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -38,11 +39,13 @@ class ItemRepositoryTest {
 
     @Test
     void findAllByOwner_IdOrderById() {
-        List<Item> itemsList = itemRepository.findAllByOwner_IdOrderById(user1.getId());
+        List<Item> itemsList = itemRepository
+                .findAllByOwner_IdOrderById(user1.getId(), PageRequest.of(0, 10));
         assertNotNull(itemsList, "Список пуст!");
         assertEquals(1, itemsList.size(), "В списке неверное кол-во вещей!");
         assertEquals("item1", itemsList.get(0).getName(), "Неправильное имя вещи!");
-        Item secondItem = itemRepository.findAllByOwner_IdOrderById(user2.getId()).get(0);
+        Item secondItem = itemRepository
+                .findAllByOwner_IdOrderById(user2.getId(), PageRequest.of(0, 10)).get(0);
         itemsList.add(secondItem);
         assertNotNull(itemsList, "Список пуст!");
         assertEquals(2, itemsList.size(), "В списке неверное кол-во вещей!");
@@ -56,7 +59,8 @@ class ItemRepositoryTest {
         assertEquals(1, itemsSearchList.size(), "В списке неверное кол-во вещей!");
         assertEquals("Description of item1", itemsSearchList.get(0).getDescription(),
                 "Неправильное имя вещи!");
-        Item secondItem = itemRepository.findItemListBySearch("item2").get(0);
+        Item secondItem = itemRepository
+                .findItemListBySearch("item2").get(0);
         itemsSearchList.add(secondItem);
         assertEquals(2, itemsSearchList.size(), "В списке неверное кол-во вещей!");
         assertEquals("Description of item2", itemsSearchList.get(1).getDescription(),

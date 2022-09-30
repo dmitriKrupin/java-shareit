@@ -43,8 +43,7 @@ class ItemRequestRepositoryTest {
 
     @Test
     void findAllByRequestor_Id() {
-        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestor_Id(
-                userOne.getId(), PageRequest.of(0, 10));
+        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestor_Id(userOne.getId());
         assertNotNull(itemRequestList, "Список пуст!");
         assertEquals(1, itemRequestList.size(), "В списке неверное кол-во запросов!");
         assertEquals(itemRequestOne.getDescription(), itemRequestList.get(0).getDescription(), "Неправильное описание!");

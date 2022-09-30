@@ -54,13 +54,9 @@ public class ItemRequestController {
     @GetMapping("/{requestId}")
     public ItemRequestDtoOut getRequestById(
             @PathVariable long requestId,
-            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
             @Validated @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Получаем GET запрос к эндпойнту /requests/{}", requestId);
-        int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size);
-        return itemRequestService.getRequestById(userId, requestId, pageRequest);
+        return itemRequestService.getRequestById(userId, requestId);
     }
 
 }

@@ -13,5 +13,5 @@ public interface ItemRequestService {
 
     List<ItemRequestDtoOut> getAllRequestsOtherUsers(Long ownerId, PageRequest pageRequest);
 
-    ItemRequestDtoOut getRequestById(long userId, long requestId, PageRequest pageRequest);
+    ItemRequestDtoOut getRequestById(long userId, long requestId);
 }
