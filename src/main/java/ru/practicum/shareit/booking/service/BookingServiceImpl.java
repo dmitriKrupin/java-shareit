@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
@@ -17,6 +18,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -31,14 +33,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDtoOut addBooking(BookingDtoIn bookingDtoIn, String userId) {
+    public BookingDtoOut addBooking(BookingDtoIn bookingDtoIn, Long userId) {
         Booking booking = BookingMapper.toBooking(bookingDtoIn);
-        booking.setBooker(userRepository.findById(Long.parseLong(userId))
+        booking.setBooker(userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Нет такого пользователя с id " + userId)));
         Long itemId = bookingDtoIn.getItemId();
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Нет такой вещи с id " + itemId));
-        if (item.getOwner().getId() == Long.parseLong(userId)) {
+        if (Objects.equals(item.getOwner().getId(), userId)) {
             throw new NotFoundException("В аренду нельзя взять свое оборудование!");
         }
         booking.setItem(item);
@@ -55,12 +57,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDtoOut approvedBooking(String userId, Long bookingId, Boolean approved) {
-        List<Item> itemsList = itemRepository.findAllByOwner_IdOrderById(Long.parseLong(userId));
+    public BookingDtoOut approvedBooking(Long userId, Long bookingId, Boolean approved) {
+        List<Item> itemsList = itemRepository.findAllByOwner_IdOrderById(
+                userId, PageRequest.of(0, 10));
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Нет такого бронирования с id " + bookingId));
         if (itemsList.contains(booking.getItem())
-                && booking.getItem().getOwner().getId() == Long.parseLong(userId)) {
+                && Objects.equals(booking.getItem().getOwner().getId(), userId)) {
             if (approved) {
                 if (booking.getStatus() != Status.APPROVED) {
                     booking.setStatus(Status.APPROVED);
@@ -78,16 +81,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoOut> getAllBookingsByBookerId(String bookerId, String state) {
-        long bookerIdFromString = Long.parseLong(bookerId);
+    public List<BookingDtoOut> getAllBookingsByBookerId(Long bookerId, String state, PageRequest pageRequest) {
+        long bookerIdFromString = bookerId;
         if (userRepository.existsById(bookerIdFromString)) {
             List<Booking> bookingsList;
             if (state == null || state.equals(Status.ALL.toString())) {
                 bookingsList = bookingRepository.findAllByBooker_IdOrderByEndDesc(
-                        bookerIdFromString);
+                        bookerIdFromString, pageRequest);
             } else {
                 bookingsList = bookingRepository.findAllByBooker_IdAndStatusInOrderByEndDesc(
-                        bookerIdFromString, getListOfStatus(state));
+                        bookerIdFromString, getListOfStatus(state), pageRequest);
                 if (state.equals(Status.PAST.toString())) {
                     bookingsList = bookingsList.subList(bookingsList.size() - 1, bookingsList.size());
                 }
@@ -130,20 +133,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoOut> getAllBookingsByOwnerId(String ownerId, String state) {
-        long ownerIdFromString = Long.parseLong(ownerId);
+    public List<BookingDtoOut> getAllBookingsByOwnerId(Long ownerId, String state, PageRequest pageRequest) {
+        long ownerIdFromString = ownerId;
         if (userRepository.existsById(ownerIdFromString)) {
             List<Booking> bookingsList;
             List<Long> ownerIdsList = new ArrayList<>();
-            List<Item> item = itemRepository.findAllByOwner_IdOrderById(ownerIdFromString);
+            List<Item> item = itemRepository.findAllByOwner_IdOrderById(
+                    ownerIdFromString, PageRequest.of(0, 10));
             for (Item entry : item) {
                 ownerIdsList.add(entry.getId());
             }
             if (state == null || state.equals(Status.ALL.toString())) {
-                bookingsList = bookingRepository.findAllByItem_IdInOrderByEndDesc(ownerIdsList);
+                bookingsList = bookingRepository.findAllByItem_IdInOrderByEndDesc(ownerIdsList, pageRequest);
             } else {
                 bookingsList = bookingRepository.findAllByItem_IdInAndStatusInOrderByEndDesc(
-                        ownerIdsList, getListOfStatus(state));
+                        ownerIdsList, getListOfStatus(state), pageRequest);
                 if (state.equals(Status.PAST.toString())) {
                     bookingsList = bookingsList.subList(bookingsList.size() - 1, bookingsList.size());
                 }
@@ -155,11 +159,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDtoOut getBookingById(long bookingId, String userId) {
+    public BookingDtoOut getBookingById(Long bookingId, Long userId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Нет такого бронирования с id " + bookingId));
-        if (booking.getItem().getOwner().getId() == Long.parseLong(userId)
-                || booking.getBooker().getId() == Long.parseLong(userId)) {
+        if (Objects.equals(booking.getItem().getOwner().getId(), userId)
+                || Objects.equals(booking.getBooker().getId(), userId)) {
             return BookingMapper.toBookingDtoOut(booking);
         } else {
             throw new NotFoundException("У этого бронирования другой арендатор");

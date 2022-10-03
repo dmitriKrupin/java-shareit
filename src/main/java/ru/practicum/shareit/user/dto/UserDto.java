@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.validate.Create;
+import ru.practicum.shareit.common.Create;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

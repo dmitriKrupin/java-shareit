@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -15,16 +15,16 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @Entity
 @Table(name = "requests", schema = "public")
-public class ItemRequest { //И в пакете request будет ItemRequest — класс, отвечающий за запрос вещи.
+public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id; //id — уникальный идентификатор запроса;
+    private Long id;
     @Column(name = "description")
-    private String description; //description — текст запроса, содержащий описание требуемой вещи;
+    private String description;
     @ManyToOne
     @JoinColumn(name = "requestor_id")
-    private User requestor; //requestor — пользователь, создавший запрос;
+    private User requestor;
     @Column(name = "created")
-    private LocalDate created; //created — дата и время создания запроса.
+    private LocalDateTime created;
 }

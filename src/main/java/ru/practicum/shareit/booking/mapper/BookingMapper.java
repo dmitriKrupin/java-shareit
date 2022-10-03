@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookingMapper {
-    public static BookingDtoIn toBookingDto(Booking booking) {
+    public static BookingDtoIn toBookingDtoIn(Booking booking) {
         return new BookingDtoIn(
                 booking.getId(),
                 booking.getItem().getId(),

@@ -2,12 +2,9 @@ package ru.practicum.shareit.item.mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.dto.CommentDtoOut;
-import ru.practicum.shareit.item.dto.ItemDtoIn;
-import ru.practicum.shareit.item.dto.ItemDtoOutPost;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
@@ -16,14 +13,14 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode
 public class ItemMapper {
-    public static ItemDtoIn toItemDto(Item item) {
-        return new ItemDtoIn(
+    public static ItemDtoOut toItemDtoOut(Item item) {
+        return new ItemDtoOut(
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable()
+                item.getAvailable(),
+                item.getItemRequest() != null ? item.getItemRequest().getId() : null
         );
     }
 
@@ -93,19 +90,32 @@ public class ItemMapper {
         );
     }
 
-    public static List<ItemDtoIn> toItemsListDto(List<Item> itemsList) {
-        List<ItemDtoIn> itemsDtoList = new ArrayList<>();
+    public static ItemDtoIn toItemDtoIn(Item item) {
+        return new ItemDtoIn(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable()
+        );
+    }
+
+    public static List<ItemDtoOut> toItemsDtoOutList(List<Item> itemsList) {
+        List<ItemDtoOut> itemsDtoList = new ArrayList<>();
         for (Item entry : itemsList) {
-            itemsDtoList.add(ItemMapper.toItemDto(entry));
+            itemsDtoList.add(ItemMapper.toItemDtoOut(entry));
         }
         return itemsDtoList;
     }
 
-    public static List<ItemDtoOutPost> toItemsListDtoOutPost(List<Item> itemsList) {
+    public static List<ItemDtoOutPost> toItemsListDtoOutPost(
+            List<Item> itemsList,
+            Booking lastBooking,
+            Booking nextBooking,
+            List<CommentDtoOut> comments) {
         List<ItemDtoOutPost> itemsListDtoOutPost = new ArrayList<>();
         for (Item entry : itemsList) {
             itemsListDtoOutPost.add(ItemMapper.toItemInfoDto(
-                    entry, new Booking(), new Booking(), new ArrayList<>()));
+                    entry, lastBooking, nextBooking, comments));
         }
         return itemsListDtoOutPost;
     }
@@ -116,6 +126,13 @@ public class ItemMapper {
                 comment.getText(),
                 comment.getAuthor().getName(),
                 comment.getCreated()
+        );
+    }
+
+    public static CommentDtoIn toCommentDtoIn(Comment comment) {
+        return new CommentDtoIn(
+                comment.getId(),
+                comment.getText()
         );
     }
 
