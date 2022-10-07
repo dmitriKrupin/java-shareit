@@ -29,12 +29,15 @@ class ItemRepositoryTest {
     @BeforeEach
     void beforeEach() {
         user1 = userRepository.save(new User(1L, "one@user.com", "user1"));
-        item1 = itemRepository.save(new Item(1L, "item1", "Description of item1", false));
-        item1.setOwner(user1);
-
         user2 = userRepository.save(new User(2L, "two@user.com", "user2"));
-        item2 = itemRepository.save(new Item(2L, "item2", "Description of item2", false));
+
+        item1 = new Item(1L, "item1", "Description of item1", false);
+        item1.setOwner(user1);
+        item1 = itemRepository.save(item1);
+
+        item2 = new Item(2L, "item2", "Description of item2", false);
         item2.setOwner(user2);
+        item2 = itemRepository.save(item2);
     }
 
     @Test

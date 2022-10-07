@@ -85,7 +85,7 @@ public class BookingServiceImpl implements BookingService {
         long bookerIdFromString = bookerId;
         if (userRepository.existsById(bookerIdFromString)) {
             List<Booking> bookingsList;
-            if (state.equals("null") || state.equals(Status.ALL.toString())) {
+            if (Objects.isNull(state) || state.equals(Status.ALL.toString())) {
                 bookingsList = bookingRepository.findAllByBooker_IdOrderByEndDesc(
                         bookerIdFromString, pageRequest);
             } else {
@@ -143,7 +143,7 @@ public class BookingServiceImpl implements BookingService {
             for (Item entry : item) {
                 ownerIdsList.add(entry.getId());
             }
-            if (state.equals("null") || state.equals(Status.ALL.toString())) {
+            if (Objects.isNull(state) || state.equals(Status.ALL.toString())) {
                 bookingsList = bookingRepository.findAllByItem_IdInOrderByEndDesc(ownerIdsList, pageRequest);
             } else {
                 bookingsList = bookingRepository.findAllByItem_IdInAndStatusInOrderByEndDesc(

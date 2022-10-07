@@ -36,7 +36,7 @@ public class ItemController {
             @PathVariable long itemId,
             @Validated @RequestBody CommentDtoIn commentDtoIn,
             @RequestHeader("X-Sharer-User-Id") long userId) {
-        log.info("Получаем GET запрос к эндпойнту /{}/comment", itemId);
+        log.info("Получаем POST запрос к эндпойнту /{}/comment", itemId);
         return itemClient.addComment(commentDtoIn, itemId, userId);
     }
 
